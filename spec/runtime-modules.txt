@@ -111,6 +111,7 @@ modules/filebrowser/metadata/hardcover.lua|unit
 modules/filebrowser/metadata/http.lua|unit
 modules/filebrowser/metadata/isbn.lua|unit
 modules/filebrowser/metadata/open_library.lua|unit
+modules/filebrowser/metadata/author_images.lua|unit
 modules/filebrowser/metadata/service.lua|unit
 modules/filebrowser/metadata/vendor/slaxdom.lua|unit
 modules/filebrowser/metadata/vendor/slaxml.lua|unit
