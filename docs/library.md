@@ -96,6 +96,12 @@ Paths below start at **Zen Settings > Library**.
 
 To add a book to To Be Read, hold it in the Library and choose **Read status > To Be Read**. It then appears in To Be Read Navbar tabs and Home widgets that use that source. **Include new books in TBR** also includes unread or modified books without changing their saved read status.
 
+## Author images
+
+Hold an author in the Authors view and choose **Find author image online** to show the author's photo in place of their book covers. Photos come from Open Library, or from Wikipedia when Open Library has none. To fetch photos for every author who doesn't have one yet, hold an empty area of the Authors view and choose **Find missing author images**. Images you already have are kept. Lookups run only when you ask for them.
+
+Photos are saved in `koreader/zen-author-images/`, named after the author (for example `Terry Pratchett.jpg`). You can also put your own JPEG or PNG there under the same name. To go back to the book covers, hold the author and choose **Remove author image**.
+
 ## Metadata editor
 
 ![Metadata editor](/images/zen_os/metadata_editor.webp)

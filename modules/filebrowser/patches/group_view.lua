@@ -108,6 +108,14 @@ local function rebuild_home()
     end
 end
 
+-- Repaint everything that shows author tiles after a photo changes.
+local function refresh_author_images()
+    if _authors_menu and type(_authors_menu.updateItems) == "function" then
+        _authors_menu:updateItems()
+    end
+    rebuild_home()
+end
+
 local function get_display_mode(tab_id, group_name, fallback)
     local cfg = load_zen_config()
     local group_view = cfg and cfg.group_view
@@ -1354,9 +1362,21 @@ function M.showGroupContextMenu(group_name, files, tab_id, menu, options)
         return false
     end
     local hide_actions = type(options) == "table" and options.hide_actions == true
+    local prepend_buttons
+    if tab_id == "authors" then
+        local file_chooser = fm.file_chooser
+        prepend_buttons = require("modules/filebrowser/author_image_actions").holdButtons(
+            group_name,
+            function()
+                if file_chooser.file_dialog then require("ui/uimanager"):close(file_chooser.file_dialog) end
+            end,
+            refresh_author_images)
+    end
     fm.file_chooser:showFileDialog({
         _zen_group_files = files,
         _zen_group_name = group_name,
+        _zen_author = tab_id == "authors" and group_name or nil,
+        _zen_prepend_buttons = prepend_buttons,
         _zen_sort_cb = not hide_actions and function()
             showDetailSortDialog(group_name, tab_id, nil, files)
         end or nil,
@@ -1435,10 +1455,30 @@ function M.showSourceContextMenu(tab_id, menu, options)
         subtitle = count == 1 and _("1 series")
             or (tostring(count) .. " " .. _("series"))
     end
+    local prepend_buttons
+    if tab_id == "authors" then
+        local file_chooser = fm.file_chooser
+        prepend_buttons = {{{
+            text = require("common/inline_icon_map").download .. "  "
+                .. _("Find missing author images"),
+            align = "left",
+            callback = function()
+                if file_chooser.file_dialog then require("ui/uimanager"):close(file_chooser.file_dialog) end
+                local ok_db, db = pcall(require, "common/db_bookinfo")
+                local names = {}
+                for _i, group in ipairs(ok_db and db.getGroupedByAuthor() or {}) do
+                    names[#names + 1] = group.author
+                end
+                require("modules/filebrowser/author_image_actions").findAll(
+                    names, refresh_author_images)
+            end,
+        }}}
+    end
     fm.file_chooser:showFileDialog({
         _zen_group_files = {},
         _zen_group_name = label,
         _zen_group_subtitle = subtitle,
+        _zen_prepend_buttons = prepend_buttons,
         _zen_sort_cb = function() showGroupSortDialog(tab_id, menu) end,
         _zen_display_cb = function() showDisplayModeDialog(menu, tab_id) end,
     })

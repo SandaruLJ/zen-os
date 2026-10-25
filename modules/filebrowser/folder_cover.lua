@@ -503,6 +503,18 @@ local function gallery_identity(menu, entry, title)
     }, "\30")
 end
 
+-- authorImage(entry) -> the saved photo for an author group, or nil.
+function M.authorImage(entry)
+    if type(entry) ~= "table" or entry._zen_type ~= "authors"
+            or type(entry._zen_author) ~= "string" then
+        return nil
+    end
+    local ok, AuthorImages = pcall(require, "modules/filebrowser/metadata/author_images")
+    if not ok then return nil end
+    local ok_path, path = pcall(AuthorImages.path, entry._zen_author)
+    return ok_path and path or nil
+end
+
 function M.build(menu, entry, menu_text, max_w, max_h, options)
     options = options or {}
     local title = M.title(entry, menu_text, menu)
@@ -563,6 +575,20 @@ function M.build(menu, entry, menu_text, max_w, max_h, options)
             or (type(explicit_covers) == "table" and #explicit_covers > 0)
         append_covers(covers, explicit_covers, max_covers)
         perf.explicit_ms = elapsed_ms(explicit_started_at)
+    end
+
+    if load_covers and not has_explicit
+            and not (entry and (entry.is_go_up or entry._zen_empty_placeholder)) then
+        local author_path = M.authorImage(entry)
+        if author_path then
+            local author_started_at = now()
+            local cover = CoverUtils.loadExplicitCover(author_path, max_w, max_h)
+            if cover then
+                covers[1] = cover
+                has_explicit = true
+            end
+            perf.explicit_ms = perf.explicit_ms + elapsed_ms(author_started_at)
+        end
     end
 
     if load_covers and not has_explicit and mode == "gallery"

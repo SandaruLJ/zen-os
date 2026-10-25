@@ -937,6 +937,8 @@ function M.build_strip(ctx, source_key)
             is_series_group = book.group_kind == "series",
             text = book.group_label,
             mandatory = book.group_count,
+            _zen_type = book.group_kind == "authors" and "authors" or nil,
+            _zen_author = book.group_kind == "authors" and book.group_label or nil,
         }
         local specs = {
             max_cover_w = target_w,

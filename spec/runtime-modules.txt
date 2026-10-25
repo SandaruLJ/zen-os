@@ -105,6 +105,7 @@ config/preset_store.lua|unit
 config/screensaver_presets.lua|unit
 modules/filebrowser/filebrowser.lua|integration
 modules/filebrowser/folder_cover.lua|unit
+modules/filebrowser/author_image_actions.lua|integration
 modules/filebrowser/metadata/epub.lua|unit
 modules/filebrowser/metadata/google_books.lua|unit
 modules/filebrowser/metadata/hardcover.lua|unit

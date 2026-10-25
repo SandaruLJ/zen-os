@@ -1049,13 +1049,25 @@ local function apply_context_menu()
                     end
                 }
 
-                -- Use unified makeCover for folder (gallery mode)
-                local cover_widget = Cover.makeCover(group_name, fake_chooser, {
-                    is_folder = true,
-                    max_w = cover_max_w,
-                    max_h = cover_max_h,
-                    folder_name = group_name,
-                })
+                -- An author's saved photo stands in for the gallery.
+                local cover_widget
+                local author_image = item._zen_author and require(
+                    "modules/filebrowser/folder_cover").authorImage({
+                        _zen_type = "authors", _zen_author = item._zen_author })
+                local author_cover = author_image
+                    and Cover.loadExplicitCover(author_image, cover_max_w, cover_max_h)
+                if author_cover then
+                    local portrait_w, portrait_h = Cover.calcDims(cover_max_w, cover_max_h)
+                    cover_widget = Cover.drawSingle(author_cover, portrait_w, portrait_h, border)
+                else
+                    -- Use unified makeCover for folder (gallery mode)
+                    cover_widget = Cover.makeCover(group_name, fake_chooser, {
+                        is_folder = true,
+                        max_w = cover_max_w,
+                        max_h = cover_max_h,
+                        folder_name = group_name,
+                    })
+                end
 
                 local framed_gallery = cover_widget or FrameContainer:new{
                     padding    = 0,
